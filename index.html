@@ -1,50 +1,262 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+    <title>Audio Visualization with D3.js</title>
 
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/white.css">
 
-		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/zenburn.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/default.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
-		</div>
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <h2>Audio Visualization with D3.js</h2>
+        </section>
+        <section>
+          <p><a href="https://www.bignerdranch.com/blog/music-visualization-with-d3-js/">https://www.bignerdranch.com/blog/music-visualization-with-d3-js/</a></p>
+          <img src="content/tutorial.png" alt="" />
+        </section>
+        <section>
+          <h2>Audio Element</h2>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim contenteditable>&lt;audio src=&quot;old-faithful.mp3&quot; controls=&quot;controls&quot;&gt;&lt;/audio&gt;</code></pre>
+        </section>
+        <section>
+          <audio src="content/old-faithful.mp3" controls="controls"></audio>
+        </section>
+        <section>
+          <h2>Audio Context</h2>
+        </section>
+        <section>
+          <img src="content/diagram.svg" alt="" />
+          <p>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API</a></p>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim contenteditable>
+var audioCtx = window.AudioContext();
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
+var audioElement = document.querySelector('audio');
 
-		<script>
-			// More info https://github.com/hakimel/reveal.js#configuration
-			Reveal.initialize({
-				history: true,
+var audioSrc = audioCtx.createMediaElementSource(audioElement);
+          </code></pre>
+        </section>
+        <section>
+          <h2>Analyser</h2>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim contenteditable>
+var analyser = audioCtx.createAnalyser();
 
-				// More info https://github.com/hakimel/reveal.js#dependencies
-				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
-				]
-			});
-		</script>
-	</body>
+audioSrc.connect(analyser);
+
+audioSrc.connect(audioCtx.destination);
+          </code></pre>
+        </section>
+        <section>
+          <h2>Frequency Data</h2>
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+var frequencyData = new Uint8Array(200);
+</code></pre>
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+[0, 0, 0, 0, … 0]
+</code></pre>
+        </section>
+        <section>
+          <h2>D3.js</h2>
+        </section>
+        <section>
+          <img src="content/d3.png" alt="" />
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim contenteditable>&lt;script src=&quot;d3.v3.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+        </section>
+        <section>
+          <h2>SVG Element</h2>
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+var svgHeight = 300;
+var svgWidth = 1200;
+
+var svg = d3.select('body').append('svg');
+
+svg.attr('height', svgHeight);
+svg.attr('width', svgWidth);
+</code></pre>
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+&lt;svg height=&quot;300&quot; width=&quot;1200&quot;&gt;&lt;/svg&gt;
+</code></pre>
+        </section>
+        <section>
+          <h2>Rectangles</h2>
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+var barPadding = 1;
+
+svg.selectAll('rect')
+  .data(frequencyData)
+  .enter()
+  .append('rect')
+  .attr('x', function (data, index) {
+    return index * (svgWidth / frequencyData.length);
+  })
+  .attr('width', (svgWidth / frequencyData.length) - barPadding);
+</code></pre>
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+&lt;svg height=&quot;300&quot; width=&quot;1200&quot;&gt;
+  &lt;rect width=&quot;5&quot; height=&quot;0&quot; y=&quot;300&quot; x=&quot;0&quot;&gt;&lt;/rect&gt;
+  &lt;rect width=&quot;5&quot; height=&quot;0&quot; y=&quot;300&quot; x=&quot;6&quot;&gt;&lt;/rect&gt;
+  &lt;rect width=&quot;5&quot; height=&quot;0&quot; y=&quot;300&quot; x=&quot;12&quot;&gt;&lt;/rect&gt;
+  …
+&lt;/svg&gt;
+</code></pre>
+        </section>
+        <section>
+          <h2>Browser Painting</h2>
+        </section>
+        <section>
+          <img src="content/dom-to-pixels.png" alt="" />
+          <p>Source: <a href="http://www.html5rocks.com/en/tutorials/speed/unnecessary-paints/">http://www.html5rocks.com/en/tutorials/speed/unnecessary-paints/</a></p>
+        </section>
+        <section>
+          <p>In Chrome that combined tree of DOM and CSS is rasterized by some software called Skia. If you've ever played with the canvas element Skia's API would look awfully familiar to you; there are many moveTo- and lineTo-style functions as well as a bunch of more advanced ones.</p>
+        </section>
+        <section>
+          <img src="content/draw.jpg" alt="" />
+        </section>
+        <section>
+          <p>Essentially all the elements that need to be painted are distilled to a collection of Skia calls that can be executed, and the output of is a bunch of bitmaps. These bitmaps are uploaded to the GPU, and the GPU helps out by compositing them together to give us the final picture on screen.</p>
+        </section>
+        <section>
+          <img src="content/composite.jpg" alt="" />
+        </section>
+        <section>
+          <h2>requestAnimationFrame()</h2>
+        </section>
+        <section>
+          <p>The window.requestAnimationFrame() method tells the browser that you wish to perform an animation and requests that the browser call a specified function to update an animation before the next repaint. The method takes as an argument a callback to be invoked before the repaint.</p>
+          <p>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame">https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame</a></p>
+        </section>
+        <section>
+          <h2>Animation Loop</h2>
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+function renderChart() {
+  requestAnimationFrame(renderChart);
+}
+renderChart();
+</code></pre>
+</section>
+        <section>
+          <h2>Frequency Data</h2>
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+analyser.getByteFrequencyData(frequencyData);
+</code></pre>
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+function renderChart() {
+  requestAnimationFrame(renderChart);
+
+  analyser.getByteFrequencyData(frequencyData);
+}
+</code></pre>
+        </section>
+        <section>
+          “frequencyData” contains values in the range: 0-255
+        </section>
+        <section>
+          <h2>Update rectangles</h2>
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+svg.selectAll('rect')
+  .data(frequencyData)
+  .attr('height', function(d) {
+    return d;
+  })
+  .attr('y', function(d) {
+    return svgHeight - d;
+  })
+</code></pre>
+        </section>
+        <section>
+          <img src="content/bar.jpg" alt="" />
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+function renderChart() {
+  requestAnimationFrame(renderChart);
+
+  analyser.getByteFrequencyData(frequencyData);
+
+  svg.selectAll('rect')
+    .data(frequencyData)
+    .attr('y', function(d) {
+      return svgHeight - d;
+    })
+    .attr('height', function(d) {
+      return d;
+    })
+    .attr('fill', function(d) {
+      return 'rgb(0, 0, ' + d + ')';
+    });
+}
+</code></pre>
+        </section>
+        <section>
+          <h2>Demo</h2>
+          <p><a href="http://jimthoburn.github.io/yellowstone/visualizer">http://jimthoburn.github.io/yellowstone/visualizer</a></p>
+        </section>
+      </div>
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+      // More info https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        history: true,
+
+        transition: 'none',
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+          { src: 'plugin/markdown/marked.js' },
+          { src: 'plugin/markdown/markdown.js' },
+          { src: 'plugin/notes/notes.js', async: true },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        ]
+      });
+    </script>
+  </body>
 </html>
