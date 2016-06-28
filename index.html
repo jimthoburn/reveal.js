@@ -44,10 +44,6 @@
           <h2>Audio Context</h2>
         </section>
         <section>
-          <img src="content/diagram.svg" alt="" />
-          <p>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API</a></p>
-        </section>
-        <section>
           <pre><code class="hljs" data-trim contenteditable>
 var audioCtx = window.AudioContext();
 
@@ -67,6 +63,10 @@ audioSrc.connect(analyser);
 
 audioSrc.connect(audioCtx.destination);
           </code></pre>
+        </section>
+        <section>
+          <img src="content/diagram.svg" alt="" />
+          <p>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API</a></p>
         </section>
         <section>
           <h2>Frequency Data</h2>
@@ -129,9 +129,9 @@ svg.selectAll('rect')
         <section>
 <pre><code class="hljs" data-trim contenteditable>
 &lt;svg height=&quot;300&quot; width=&quot;1200&quot;&gt;
-  &lt;rect width=&quot;5&quot; height=&quot;0&quot; y=&quot;300&quot; x=&quot;0&quot;&gt;&lt;/rect&gt;
-  &lt;rect width=&quot;5&quot; height=&quot;0&quot; y=&quot;300&quot; x=&quot;6&quot;&gt;&lt;/rect&gt;
-  &lt;rect width=&quot;5&quot; height=&quot;0&quot; y=&quot;300&quot; x=&quot;12&quot;&gt;&lt;/rect&gt;
+  &lt;rect width=&quot;5&quot; x=&quot;0&quot;&gt;&lt;/rect&gt;
+  &lt;rect width=&quot;5&quot; x=&quot;6&quot;&gt;&lt;/rect&gt;
+  &lt;rect width=&quot;5&quot; x=&quot;12&quot;&gt;&lt;/rect&gt;
   …
 &lt;/svg&gt;
 </code></pre>
@@ -174,7 +174,7 @@ renderChart();
 </code></pre>
 </section>
         <section>
-          <h2>Frequency Data</h2>
+          <h2>Update Frequency Data</h2>
         </section>
         <section>
 <pre><code class="hljs" data-trim contenteditable>
@@ -192,6 +192,11 @@ function renderChart() {
         </section>
         <section>
           “frequencyData” contains values in the range: 0-255
+        </section>
+        <section>
+<pre><code class="hljs" data-trim contenteditable>
+[181, 178, 102, 95, … 154]
+</code></pre>
         </section>
         <section>
           <h2>Update rectangles</h2>
@@ -235,6 +240,9 @@ function renderChart() {
         <section>
           <h2>Demo</h2>
           <p><a href="http://jimthoburn.github.io/yellowstone/visualizer">http://jimthoburn.github.io/yellowstone/visualizer</a></p>
+        </section>
+        <section>
+          <h2>Thanks!</h2>
         </section>
       </div>
     </div>
